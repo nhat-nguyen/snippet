@@ -42,7 +42,7 @@ class SnippetAdapter(
     }
 
     class ResultViewHolder(val rootView: View) : RecyclerView.ViewHolder(rootView) {
-        val name: TextView = rootView.findViewById(R.id.name) as TextView
-        val value: TextView = rootView.findViewById(R.id.value) as TextView
+        val name: TextView = rootView.findViewById(R.id.name)
+        val value: TextView = rootView.findViewById(R.id.value)
     }
 }
