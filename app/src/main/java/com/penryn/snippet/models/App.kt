@@ -8,10 +8,11 @@ import io.realm.annotations.Required
  * Created by hoangnhat on 2017-09-04.
  */
 
-class App(
+open class App(
     @Required
     @PrimaryKey
-    val packageName: String,
+    var packageName: String = "",
 
-    @Required val label: String
+    @Required
+    var label: String = ""
 ) : RealmObject()
