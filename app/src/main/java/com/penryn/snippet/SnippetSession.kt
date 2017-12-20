@@ -53,8 +53,8 @@ class SnippetSession(
         val v = layoutInflater.inflate(R.layout.dialog_search, null)
         scrim = v.findViewById(R.id.scrim)
         background = v.findViewById(R.id.background)
-        searchResults = v.findViewById(R.id.results) as RecyclerView
-        searchBox = v.findViewById(R.id.search) as EditText
+        searchResults = v.findViewById(R.id.results)
+        searchBox = v.findViewById(R.id.search)
         setupViews()
         return v
     }
@@ -84,7 +84,7 @@ class SnippetSession(
         searchResults.adapter = appAdapter
         searchResults.layoutManager = LinearLayoutManager(context)
         searchResults.addItemDecoration(LineItemDecoration(
-            ContextCompat.getDrawable(context, R.drawable.line_divider)
+            ContextCompat.getDrawable(context, R.drawable.line_divider)!!
         ))
 
         searchBox.addTextChangedListener(object : TextWatcher {
