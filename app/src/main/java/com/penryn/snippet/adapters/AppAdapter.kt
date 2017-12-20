@@ -41,8 +41,8 @@ class AppAdapter(
     }
 
     class AppViewHolder(val rootView: View) : RecyclerView.ViewHolder(rootView) {
-        val appIcon: ImageView = rootView.findViewById(R.id.app_icon) as ImageView
-        val appLabel: TextView = rootView.findViewById(R.id.app_label) as TextView
-        val appPackageName: TextView = rootView.findViewById(R.id.app_package_name) as TextView
+        val appIcon: ImageView = rootView.findViewById(R.id.app_icon)
+        val appLabel: TextView = rootView.findViewById(R.id.app_label)
+        val appPackageName: TextView = rootView.findViewById(R.id.app_package_name)
     }
 }
