@@ -1,6 +1,8 @@
 package com.penryn.snippet.adapters
 
 import android.content.Context
+import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +11,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.penryn.snippet.R
 import com.penryn.snippet.models.App
+import java.util.*
+import kotlin.collections.HashMap
 
 /**
  * Created by hoangnhat on 2017-09-04.
@@ -20,6 +24,8 @@ class AppAdapter(
     private val listener: (app: App) -> Unit
 ) : FilterableAdapter<App, AppAdapter.AppViewHolder>(dataset) {
 
+    val iconCache: HashMap<String, Drawable> = HashMap()
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppViewHolder {
         val v = LayoutInflater.from(context).inflate(R.layout.app_item, parent, false)
         return AppViewHolder(v)
@@ -27,8 +33,14 @@ class AppAdapter(
 
     override fun onBindViewHolder(holder: AppViewHolder, position: Int) {
         val app = filteredDataset[position]
-        val icon = context.packageManager.getApplicationIcon(app.packageName)
-        holder.appIcon.setImageDrawable(icon)
+        try {
+            if (!iconCache.containsKey(app.packageName)) {
+                iconCache.put(app.packageName, context.packageManager.getApplicationIcon(app.packageName))
+            }
+
+            holder.appIcon.setImageDrawable(iconCache.get(app.packageName))
+        } catch (e: PackageManager.NameNotFoundException) {}
+
         holder.appLabel.setText(app.label)
         holder.appPackageName.setText(app.packageName)
         holder.rootView.setOnClickListener {

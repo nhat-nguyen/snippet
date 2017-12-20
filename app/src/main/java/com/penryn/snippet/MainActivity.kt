@@ -3,6 +3,7 @@ package com.penryn.snippet
 import android.app.Activity
 import android.os.Bundle
 import android.widget.Toast
+import com.penryn.snippet.models.App
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -17,6 +18,7 @@ class MainActivity : Activity() {
 
         rebuild_index.setOnClickListener {
             Realm.getDefaultInstance().executeTransactionAsync({
+                it.delete(App::class.java)
                 it.insertOrUpdate(AppsManager.getApps(this.packageManager))
             }, {
                Toast.makeText(this, "Synchronization succeeded!", Toast.LENGTH_SHORT).show()
