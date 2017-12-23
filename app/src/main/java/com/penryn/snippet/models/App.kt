@@ -1,18 +1,18 @@
 package com.penryn.snippet.models
 
-import io.realm.RealmObject
-import io.realm.annotations.PrimaryKey
-import io.realm.annotations.Required
+import android.arch.persistence.room.ColumnInfo
+import android.arch.persistence.room.Entity
+import android.arch.persistence.room.PrimaryKey
 
 /**
  * Created by hoangnhat on 2017-09-04.
  */
 
-open class App(
-    @Required
+@Entity(tableName = "apps")
+class App(
     @PrimaryKey
     var packageName: String = "",
 
-    @Required
+    @ColumnInfo(name = "label")
     var label: String = ""
-) : RealmObject()
+)
