@@ -1,13 +1,16 @@
 package com.penryn.snippet
 
 import android.app.Activity
+import android.arch.persistence.room.Room
 import android.os.Bundle
 import android.widget.Toast
-import com.penryn.snippet.models.App
-import io.realm.Realm
+import com.penryn.snippet.database.SnippetAppDatabase
+import com.penryn.snippet.extensions.getLaunchableApplications
+import io.realm.internal.SyncObjectServerFacade
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : Activity() {
+    private lateinit var database: SnippetAppDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -16,15 +19,20 @@ class MainActivity : Activity() {
 
         }
 
+        database = Room.databaseBuilder(
+            SyncObjectServerFacade.getApplicationContext(),
+            SnippetAppDatabase::class.java,
+            "apps"
+        ).build()
+
         rebuild_index.setOnClickListener {
-            Realm.getDefaultInstance().executeTransactionAsync({
-                it.delete(App::class.java)
-                it.insertOrUpdate(AppsManager.getApps(this.packageManager))
-            }, {
-               Toast.makeText(this, "Synchronization succeeded!", Toast.LENGTH_SHORT).show()
-            }, {
-                Toast.makeText(this, "Synchronization failed!", Toast.LENGTH_SHORT).show()
-            })
+            Thread(Runnable {
+                database.appDao().dropTable()
+                database.appDao().insertAll(*packageManager.getLaunchableApplications().toTypedArray())
+                runOnUiThread {
+                    Toast.makeText(this, "Synchronization succeeded!", Toast.LENGTH_SHORT).show()
+                }
+            }).start()
         }
     }
 }
