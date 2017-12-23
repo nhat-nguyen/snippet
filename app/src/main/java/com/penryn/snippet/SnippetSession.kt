@@ -17,14 +17,17 @@ import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import com.penryn.snippet.adapters.AppAdapter
+import com.penryn.snippet.database.SnippetAppDatabase
+import com.penryn.snippet.extensions.runOnUiThread
 import com.penryn.snippet.models.App
-import io.realm.Realm
+
 
 /**
  * Created by hoangnhat on 2017-09-03.
  */
 class SnippetSession(
     context: Context,
+    private val database: SnippetAppDatabase,
     private val packageManager: PackageManager,
     private val inputMethodManager: InputMethodManager
 ) : VoiceInteractionSession(context) {
@@ -33,15 +36,18 @@ class SnippetSession(
     private lateinit var background: View
     private lateinit var searchBox: EditText
     private lateinit var searchResults: RecyclerView
-
-    private val appAdapter: AppAdapter
+    private var appAdapter: AppAdapter
 
     init {
         appAdapter = AppAdapter(
             context,
-            Realm.getDefaultInstance().where(App::class.java).findAllSorted("label"),
+            emptyList(),
             this::onAppClicked
         )
+
+        Thread(Runnable {
+            this.onDataLoaded(database.appDao().getAll().sortedBy { it.label })
+        }).start()
     }
 
     override fun onHandleAssist(data: Bundle?, structure: AssistStructure?, content: AssistContent?) {
@@ -101,6 +107,12 @@ class SnippetSession(
                     it.packageName.toLowerCase().contains(term) or it.label.toLowerCase().contains(term)
                 }
             }
+        })
+    }
+
+    private fun onDataLoaded(apps: List<App>) {
+        context.runOnUiThread(Runnable {
+            appAdapter.setDataset(apps)
         })
     }
 }
