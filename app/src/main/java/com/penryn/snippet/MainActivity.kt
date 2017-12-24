@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.widget.Toast
 import com.penryn.snippet.database.SnippetAppDatabase
 import com.penryn.snippet.extensions.getLaunchableApplications
-import io.realm.internal.SyncObjectServerFacade
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : Activity() {
