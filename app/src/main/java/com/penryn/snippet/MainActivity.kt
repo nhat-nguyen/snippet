@@ -20,7 +20,7 @@ class MainActivity : Activity() {
         }
 
         database = Room.databaseBuilder(
-            SyncObjectServerFacade.getApplicationContext(),
+            applicationContext,
             SnippetAppDatabase::class.java,
             "apps"
         ).build()
