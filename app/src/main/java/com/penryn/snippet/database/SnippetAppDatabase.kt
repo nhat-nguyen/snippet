@@ -10,18 +10,3 @@ import com.penryn.snippet.models.App
 abstract class SnippetAppDatabase : RoomDatabase() {
     abstract fun appDao() : AppDao
 }
-
-@Dao
-interface AppDao {
-    @Query("SELECT * FROM apps")
-    fun getAll(): List<App>
-
-    @Insert
-    fun insertAll(vararg users: App)
-
-    @Delete
-    fun delete(app: App)
-
-    @Query("DELETE FROM apps")
-    fun dropTable()
-}
