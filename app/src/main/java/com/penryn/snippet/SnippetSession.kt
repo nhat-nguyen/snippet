@@ -16,8 +16,10 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import com.penryn.snippet.adapters.PagerAdapterWithIcon
 import com.penryn.snippet.database.SnippetAppDatabase
 import com.penryn.snippet.extensions.runOnUiThread
+import com.penryn.snippet.extensions.setupWithViewPagerWithIcons
 import com.penryn.snippet.models.App
 import com.penryn.snippet.views.AppFilterableRecyclerView
 
@@ -74,16 +76,8 @@ class SnippetSession(
         pagerAdapter = SearchPagerAdapter(context, database)
 
         viewPager.adapter = pagerAdapter
-        tabBar.setupWithViewPager(viewPager)
 
-        // TODO: refactor. bind icon array size
-        val icons = arrayOf(
-            R.drawable.ic_search_black_24dp, R.drawable.clipboard,
-            R.drawable.play_store, R.drawable.ic_settings_black_24dp
-        )
-        for (i in icons.indices) {
-            tabBar.getTabAt(i)!!.setIcon(icons[i])
-        }
+        tabBar.setupWithViewPagerWithIcons(viewPager)
 
         searchBox.addTextChangedListener(object: TextWatcher {
             override fun afterTextChanged(s: Editable?) {
@@ -106,9 +100,14 @@ class SnippetSession(
 class SearchPagerAdapter(
     private val context: Context,
     private val appDatabase: SnippetAppDatabase
-): PagerAdapter() {
+): PagerAdapterWithIcon() {
 
+    // TODO: Group icon, view, data loader together
     private val viewCache: Array<View?> = arrayOfNulls(4)
+    private val icons = arrayOf(
+        R.drawable.ic_search_black_24dp, R.drawable.clipboard,
+        R.drawable.play_store, R.drawable.ic_settings_black_24dp
+    )
 
     override fun instantiateItem(container: ViewGroup, position: Int): View {
         if (viewCache[position] != null) {
@@ -146,5 +145,9 @@ class SearchPagerAdapter(
     override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
         container.removeView(`object` as View)
         viewCache[position] = null // to be garbage collected
+    }
+
+    override fun getPageIcon(position: Int): Int {
+        return icons[position]
     }
 }
