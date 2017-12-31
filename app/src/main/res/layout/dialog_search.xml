@@ -1,8 +1,9 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             android:background="#50000000"
-             android:orientation="vertical">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#50000000"
+    android:orientation="vertical">
 
     <View
         android:id="@+id/scrim"
@@ -23,75 +24,121 @@
         android:clipChildren="true"
         android:elevation="25dp">
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tab"
             android:layout_height="34dp"
+            android:layout_width="match_parent"
             android:background="@drawable/menu_bg"
-            android:gravity="center_vertical">
+            android:theme="@style/Theme.AppCompat.Light"
+            app:tabIndicatorColor="@color/colorAccent">
 
-            <ImageView
-                android:layout_width="0dp"
+            <android.support.design.widget.TabItem
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:src="@drawable/ic_search_black_24dp"
+                android:scaleType="center"
+                android:icon="@drawable/ic_search_black_24dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"/>
+
+            <android.support.design.widget.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:icon="@drawable/clipboard"
                 android:scaleType="center"
                 android:background="?android:attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"/>
 
-            <View
-                android:layout_width="0.5dp"
+            <android.support.design.widget.TabItem
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:background="@drawable/line_divider"/>
-
-            <ImageView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:src="@drawable/clipboard"
+                android:icon="@drawable/play_store"
                 android:scaleType="center"
                 android:background="?android:attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"/>
 
-            <View
-                android:layout_width="0.5dp"
+            <android.support.design.widget.TabItem
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:background="@drawable/line_divider"/>
-
-            <ImageView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:src="@drawable/play_store"
+                android:icon="@drawable/ic_settings_black_24dp"
                 android:scaleType="center"
                 android:background="?android:attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"/>
 
-            <View
-                android:layout_width="0.5dp"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:background="@drawable/line_divider"/>
+        </android.support.design.widget.TabLayout>
 
-            <ImageView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:src="@drawable/ic_settings_black_24dp"
-                android:scaleType="center"
-                android:background="?android:attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"/>
+        <!--<LinearLayout-->
+            <!--android:orientation="horizontal"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="34dp"-->
+            <!--android:background="@drawable/menu_bg"-->
+            <!--android:gravity="center_vertical">-->
 
-        </LinearLayout>
+            <!--<ImageView-->
+                <!--android:layout_width="0dp"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:layout_weight="1"-->
+                <!--android:src="@drawable/ic_search_black_24dp"-->
+                <!--android:scaleType="center"-->
+                <!--android:background="?android:attr/selectableItemBackground"-->
+                <!--android:clickable="true"-->
+                <!--android:focusable="true"/>-->
+
+            <!--<View-->
+                <!--android:layout_width="0.5dp"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:layout_marginTop="5dp"-->
+                <!--android:layout_marginBottom="5dp"-->
+                <!--android:background="@drawable/line_divider"/>-->
+
+            <!--<ImageView-->
+                <!--android:layout_width="0dp"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:layout_weight="1"-->
+                <!--android:src="@drawable/clipboard"-->
+                <!--android:scaleType="center"-->
+                <!--android:background="?android:attr/selectableItemBackground"-->
+                <!--android:clickable="true"-->
+                <!--android:focusable="true"/>-->
+
+            <!--<View-->
+                <!--android:layout_width="0.5dp"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:layout_marginTop="5dp"-->
+                <!--android:layout_marginBottom="5dp"-->
+                <!--android:background="@drawable/line_divider"/>-->
+
+            <!--<ImageView-->
+                <!--android:layout_width="0dp"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:layout_weight="1"-->
+                <!--android:src="@drawable/play_store"-->
+                <!--android:scaleType="center"-->
+                <!--android:background="?android:attr/selectableItemBackground"-->
+                <!--android:clickable="true"-->
+                <!--android:focusable="true"/>-->
+
+            <!--<View-->
+                <!--android:layout_width="0.5dp"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:layout_marginTop="5dp"-->
+                <!--android:layout_marginBottom="5dp"-->
+                <!--android:background="@drawable/line_divider"/>-->
+
+            <!--<ImageView-->
+                <!--android:layout_width="0dp"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:layout_weight="1"-->
+                <!--android:src="@drawable/ic_settings_black_24dp"-->
+                <!--android:scaleType="center"-->
+                <!--android:background="?android:attr/selectableItemBackground"-->
+                <!--android:clickable="true"-->
+                <!--android:focusable="true"/>-->
+
+        <!--</LinearLayout>-->
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -133,11 +180,10 @@
 
         </LinearLayout>
 
-        <!-- Approx. 5 items -->
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/results"
+        <android.support.v4.view.ViewPager
+            android:id="@+id/viewpager"
             android:layout_width="match_parent"
-            android:layout_height="275dp"/>
+            android:layout_height="450dp"/>
 
     </LinearLayout>
 </FrameLayout>

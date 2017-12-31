@@ -1,26 +1,25 @@
 package com.penryn.snippet
 
 import android.annotation.SuppressLint
-import android.app.assist.AssistContent
-import android.app.assist.AssistStructure
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.service.voice.VoiceInteractionSession
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import android.support.design.widget.TabLayout
+import android.support.v4.view.PagerAdapter
+import android.support.v4.view.ViewPager
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-import com.penryn.snippet.adapters.AppAdapter
 import com.penryn.snippet.database.SnippetAppDatabase
 import com.penryn.snippet.extensions.runOnUiThread
 import com.penryn.snippet.models.App
-
+import com.penryn.snippet.views.AppFilterableRecyclerView
 
 /**
  * Created by hoangnhat on 2017-09-03.
@@ -35,32 +34,18 @@ class SnippetSession(
     private lateinit var scrim: View
     private lateinit var background: View
     private lateinit var searchBox: EditText
-    private lateinit var searchResults: RecyclerView
-    private var appAdapter: AppAdapter
-
-    init {
-        appAdapter = AppAdapter(
-            context,
-            emptyList(),
-            this::onAppClicked
-        )
-
-        Thread(Runnable {
-            this.onDataLoaded(database.appDao().getAll().sortedBy { it.label })
-        }).start()
-    }
-
-    override fun onHandleAssist(data: Bundle?, structure: AssistStructure?, content: AssistContent?) {
-        super.onHandleAssist(data, structure, content)
-    }
+    private lateinit var pagerAdapter: SearchPagerAdapter
+    private lateinit var viewPager: ViewPager
+    private lateinit var tabBar: TabLayout
 
     @SuppressLint("InflateParams")
     override fun onCreateContentView(): View {
         val v = layoutInflater.inflate(R.layout.dialog_search, null)
         scrim = v.findViewById(R.id.scrim)
         background = v.findViewById(R.id.background)
-        searchResults = v.findViewById(R.id.results)
         searchBox = v.findViewById(R.id.search)
+        viewPager = v.findViewById(R.id.viewpager)
+        tabBar = v.findViewById(R.id.tab)
         setupViews()
         return v
     }
@@ -86,14 +71,21 @@ class SnippetSession(
         // consume the event so that touches within the dialog won't get passed to the background,
         // causing the dialog to be dismissed
         background.setOnTouchListener { _, _ -> true }
+        pagerAdapter = SearchPagerAdapter(context, database)
 
-        searchResults.adapter = appAdapter
-        searchResults.layoutManager = LinearLayoutManager(context)
-        searchResults.addItemDecoration(LineItemDecoration(
-            ContextCompat.getDrawable(context, R.drawable.line_divider)!!
-        ))
+        viewPager.adapter = pagerAdapter
+        tabBar.setupWithViewPager(viewPager)
 
-        searchBox.addTextChangedListener(object : TextWatcher {
+        // TODO: refactor. bind icon array size
+        val icons = arrayOf(
+            R.drawable.ic_search_black_24dp, R.drawable.clipboard,
+            R.drawable.play_store, R.drawable.ic_settings_black_24dp
+        )
+        for (i in icons.indices) {
+            tabBar.getTabAt(i)!!.setIcon(icons[i])
+        }
+
+        searchBox.addTextChangedListener(object: TextWatcher {
             override fun afterTextChanged(s: Editable?) {
             }
 
@@ -103,16 +95,56 @@ class SnippetSession(
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (s == null) return
                 val term = s.toString().toLowerCase()
-                appAdapter.filter {
-                    it.packageName.toLowerCase().contains(term) or it.label.toLowerCase().contains(term)
-                }
+//                currentTab.filter {
+//                    it.packageName.toLowerCase().contains(term) or it.label.toLowerCase().contains(term)
+//                }
             }
         })
     }
+}
 
-    private fun onDataLoaded(apps: List<App>) {
-        context.runOnUiThread(Runnable {
-            appAdapter.setDataset(apps)
-        })
+class SearchPagerAdapter(
+    private val context: Context,
+    private val appDatabase: SnippetAppDatabase
+): PagerAdapter() {
+
+    private val viewCache: Array<View?> = arrayOfNulls(4)
+
+    override fun instantiateItem(container: ViewGroup, position: Int): View {
+        if (viewCache[position] != null) {
+            return viewCache[position]!!
+        }
+
+        viewCache[position] = LayoutInflater.from(context).inflate(R.layout.tab_app_search, container, false)
+        container.addView(viewCache[position])
+
+        when (position) {
+            0, 1, 2, 3 -> {
+                Thread(Runnable {
+                    val apps = appDatabase.appDao().getAll().sortedBy { it.label }
+                    // TODO: Dangling view. Race conditions. Probably need to use destroyItem to unsubscribe properly
+                    // TODO: Don't reload
+                    // TODO: position?
+                    context.runOnUiThread(Runnable {
+                        (viewCache[position] as AppFilterableRecyclerView?)?.setDataset(apps)
+                    })
+                }).start()
+            }
+        }
+
+        return viewCache[position]!!
+    }
+
+    override fun isViewFromObject(view: View, `object`: Any): Boolean {
+        return view == `object`
+    }
+
+    override fun getCount(): Int {
+        return 4
+    }
+
+    override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
+        container.removeView(`object` as View)
+        viewCache[position] = null // to be garbage collected
     }
 }
