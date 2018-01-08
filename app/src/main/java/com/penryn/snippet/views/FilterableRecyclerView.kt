@@ -9,9 +9,8 @@ import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
-import com.penryn.snippet.LineItemDecoration
 import com.penryn.snippet.R
-import com.penryn.snippet.adapters.FilterableAdapter
+import com.penryn.snippet.adapters.recyclerview.FilterableAdapter
 
 /**
  * Created by hoangnhat on 2017-12-25.

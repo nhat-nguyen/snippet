@@ -3,7 +3,7 @@ package com.penryn.snippet.views
 import android.content.Context
 import android.util.AttributeSet
 import com.penryn.snippet.R
-import com.penryn.snippet.adapters.AppAdapter
+import com.penryn.snippet.adapters.recyclerview.AppAdapter
 import com.penryn.snippet.models.App
 
 /**

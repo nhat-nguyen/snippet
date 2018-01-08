@@ -1,4 +1,4 @@
-package com.penryn.snippet
+package com.penryn.snippet.views
 
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable

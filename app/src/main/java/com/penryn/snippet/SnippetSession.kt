@@ -6,22 +6,17 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.service.voice.VoiceInteractionSession
 import android.support.design.widget.TabLayout
-import android.support.v4.view.PagerAdapter
 import android.support.v4.view.ViewPager
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-import com.penryn.snippet.adapters.PagerAdapterWithIcon
+import com.penryn.snippet.adapters.viewpager.TabBarAdapter
 import com.penryn.snippet.database.SnippetAppDatabase
-import com.penryn.snippet.extensions.runOnUiThread
 import com.penryn.snippet.extensions.setupWithViewPagerWithIcons
 import com.penryn.snippet.models.App
-import com.penryn.snippet.views.AppFilterableRecyclerView
 
 /**
  * Created by hoangnhat on 2017-09-03.
@@ -36,7 +31,7 @@ class SnippetSession(
     private lateinit var scrim: View
     private lateinit var background: View
     private lateinit var searchBox: EditText
-    private lateinit var pagerAdapter: SearchPagerAdapter
+    private lateinit var pagerAdapter: TabBarAdapter
     private lateinit var viewPager: ViewPager
     private lateinit var tabBar: TabLayout
 
@@ -73,7 +68,7 @@ class SnippetSession(
         // consume the event so that touches within the dialog won't get passed to the background,
         // causing the dialog to be dismissed
         background.setOnTouchListener { _, _ -> true }
-        pagerAdapter = SearchPagerAdapter(context, database)
+        pagerAdapter = TabBarAdapter(context, database)
 
         viewPager.adapter = pagerAdapter
 
@@ -94,60 +89,5 @@ class SnippetSession(
 //                }
             }
         })
-    }
-}
-
-class SearchPagerAdapter(
-    private val context: Context,
-    private val appDatabase: SnippetAppDatabase
-): PagerAdapterWithIcon() {
-
-    // TODO: Group icon, view, data loader together
-    private val viewCache: Array<View?> = arrayOfNulls(4)
-    private val icons = arrayOf(
-        R.drawable.ic_search_black_24dp, R.drawable.clipboard,
-        R.drawable.play_store, R.drawable.ic_settings_black_24dp
-    )
-
-    override fun instantiateItem(container: ViewGroup, position: Int): View {
-        if (viewCache[position] != null) {
-            return viewCache[position]!!
-        }
-
-        viewCache[position] = LayoutInflater.from(context).inflate(R.layout.tab_app_search, container, false)
-        container.addView(viewCache[position])
-
-        when (position) {
-            0, 1, 2, 3 -> {
-                Thread(Runnable {
-                    val apps = appDatabase.appDao().getAll().sortedBy { it.label }
-                    // TODO: Dangling view. Race conditions. Probably need to use destroyItem to unsubscribe properly
-                    // TODO: Don't reload
-                    // TODO: position?
-                    context.runOnUiThread(Runnable {
-                        (viewCache[position] as AppFilterableRecyclerView?)?.setDataset(apps)
-                    })
-                }).start()
-            }
-        }
-
-        return viewCache[position]!!
-    }
-
-    override fun isViewFromObject(view: View, `object`: Any): Boolean {
-        return view == `object`
-    }
-
-    override fun getCount(): Int {
-        return 4
-    }
-
-    override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
-        container.removeView(`object` as View)
-        viewCache[position] = null // to be garbage collected
-    }
-
-    override fun getPageIcon(position: Int): Int {
-        return icons[position]
     }
 }
