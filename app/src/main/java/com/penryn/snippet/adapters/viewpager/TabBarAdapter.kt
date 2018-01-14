@@ -56,7 +56,6 @@ class TabBarAdapter(
 
     override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
         container.removeView(`object` as View)
-        viewCache[position] = null // to be garbage collected
     }
 
     override fun getPageIcon(position: Int): Int {
