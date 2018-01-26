@@ -37,16 +37,18 @@ class TabBarAdapter(
                 // TODO: Dangling view. Race conditions. Probably need to use destroyItem to unsubscribe properly
                 // TODO: Don't reload
                 // TODO: position?
-                disposables[position] = appDatabase.appDao().getAll()
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeOn(Schedulers.io())
-                    .map { it.sortedWith(Comparator { o1, o2 -> o1.label.compareTo(o2.label) })}
-                    .cache()
-                    .subscribe({
-                        (viewCache[position] as AppFilterableRecyclerView?)?.setDataset(it)
-                    }, {
 
-                    })
+                if (disposables[position] == null || disposables[position]!!.isDisposed) {
+                    val subscription = appDatabase.appDao().getAll()
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io())
+                        .map { it.sortedWith(Comparator { o1, o2 -> o1.label.compareTo(o2.label) })}
+                        .cache()
+
+                    disposables[position] = subscription.subscribe({
+                        (viewCache[position] as AppFilterableRecyclerView?)?.setDataset(it)
+                    }, {})
+                }
             }
         }
 
