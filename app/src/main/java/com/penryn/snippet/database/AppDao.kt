@@ -5,6 +5,7 @@ import android.arch.persistence.room.Delete
 import android.arch.persistence.room.Insert
 import android.arch.persistence.room.Query
 import com.penryn.snippet.models.App
+import io.reactivex.Single
 
 /**
  * Created by hoangnhat on 2017-12-24.
@@ -12,7 +13,7 @@ import com.penryn.snippet.models.App
 @Dao
 interface AppDao {
     @Query("SELECT * FROM apps")
-    fun getAll(): List<App>
+    fun getAll(): Single<List<App>>
 
     @Insert
     fun insertAll(vararg users: App)

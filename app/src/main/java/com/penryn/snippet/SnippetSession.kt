@@ -83,7 +83,7 @@ class SnippetSession(
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (s == null) return
-                val term = s.toString().toLowerCase()
+//                val term = s.toString().toLowerCase()
 //                currentTab.filter {
 //                    it.packageName.toLowerCase().contains(term) or it.label.toLowerCase().contains(term)
 //                }

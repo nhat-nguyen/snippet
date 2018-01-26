@@ -6,8 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import com.penryn.snippet.R
 import com.penryn.snippet.database.SnippetAppDatabase
-import com.penryn.snippet.extensions.runOnUiThread
 import com.penryn.snippet.views.AppFilterableRecyclerView
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 
 class TabBarAdapter(
     private val context: Context,
@@ -16,6 +18,7 @@ class TabBarAdapter(
 
     // TODO: Group icon, view, data loader together
     private val viewCache: Array<View?> = arrayOfNulls(4)
+    private val disposables: Array<Disposable?> = arrayOfNulls(4)
     private val icons = arrayOf(
         R.drawable.ic_search_black_24dp, R.drawable.clipboard,
         R.drawable.play_store, R.drawable.ic_settings_black_24dp
@@ -31,15 +34,19 @@ class TabBarAdapter(
 
         when (position) {
             0, 1, 2, 3 -> {
-                Thread(Runnable {
-                    val apps = appDatabase.appDao().getAll().sortedBy { it.label }
-                    // TODO: Dangling view. Race conditions. Probably need to use destroyItem to unsubscribe properly
-                    // TODO: Don't reload
-                    // TODO: position?
-                    context.runOnUiThread(Runnable {
-                        (viewCache[position] as AppFilterableRecyclerView?)?.setDataset(apps)
+                // TODO: Dangling view. Race conditions. Probably need to use destroyItem to unsubscribe properly
+                // TODO: Don't reload
+                // TODO: position?
+                disposables[position] = appDatabase.appDao().getAll()
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .map { it.sortedWith(Comparator { o1, o2 -> o1.label.compareTo(o2.label) })}
+                    .cache()
+                    .subscribe({
+                        (viewCache[position] as AppFilterableRecyclerView?)?.setDataset(it)
+                    }, {
+
                     })
-                }).start()
             }
         }
 
@@ -56,6 +63,8 @@ class TabBarAdapter(
 
     override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
         container.removeView(`object` as View)
+        viewCache[position] = null
+        disposables[position]?.dispose()
     }
 
     override fun getPageIcon(position: Int): Int {
