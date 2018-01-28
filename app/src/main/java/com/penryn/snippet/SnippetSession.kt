@@ -1,26 +1,22 @@
 package com.penryn.snippet
 
 import android.annotation.SuppressLint
-import android.app.assist.AssistContent
-import android.app.assist.AssistStructure
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.service.voice.VoiceInteractionSession
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import android.support.design.widget.TabLayout
+import android.support.v4.view.ViewPager
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-import com.penryn.snippet.adapters.AppAdapter
+import com.penryn.snippet.adapters.viewpager.TabBarAdapter
 import com.penryn.snippet.database.SnippetAppDatabase
-import com.penryn.snippet.extensions.runOnUiThread
+import com.penryn.snippet.extensions.setupWithViewPagerWithIcons
 import com.penryn.snippet.models.App
-
 
 /**
  * Created by hoangnhat on 2017-09-03.
@@ -35,32 +31,18 @@ class SnippetSession(
     private lateinit var scrim: View
     private lateinit var background: View
     private lateinit var searchBox: EditText
-    private lateinit var searchResults: RecyclerView
-    private var appAdapter: AppAdapter
-
-    init {
-        appAdapter = AppAdapter(
-            context,
-            emptyList(),
-            this::onAppClicked
-        )
-
-        Thread(Runnable {
-            this.onDataLoaded(database.appDao().getAll().sortedBy { it.label })
-        }).start()
-    }
-
-    override fun onHandleAssist(data: Bundle?, structure: AssistStructure?, content: AssistContent?) {
-        super.onHandleAssist(data, structure, content)
-    }
+    private lateinit var pagerAdapter: TabBarAdapter
+    private lateinit var viewPager: ViewPager
+    private lateinit var tabBar: TabLayout
 
     @SuppressLint("InflateParams")
     override fun onCreateContentView(): View {
         val v = layoutInflater.inflate(R.layout.dialog_search, null)
         scrim = v.findViewById(R.id.scrim)
         background = v.findViewById(R.id.background)
-        searchResults = v.findViewById(R.id.results)
         searchBox = v.findViewById(R.id.search)
+        viewPager = v.findViewById(R.id.viewpager)
+        tabBar = v.findViewById(R.id.tab)
         setupViews()
         return v
     }
@@ -86,14 +68,13 @@ class SnippetSession(
         // consume the event so that touches within the dialog won't get passed to the background,
         // causing the dialog to be dismissed
         background.setOnTouchListener { _, _ -> true }
+        pagerAdapter = TabBarAdapter(context, database)
 
-        searchResults.adapter = appAdapter
-        searchResults.layoutManager = LinearLayoutManager(context)
-        searchResults.addItemDecoration(LineItemDecoration(
-            ContextCompat.getDrawable(context, R.drawable.line_divider)!!
-        ))
+        viewPager.adapter = pagerAdapter
 
-        searchBox.addTextChangedListener(object : TextWatcher {
+        tabBar.setupWithViewPagerWithIcons(viewPager)
+
+        searchBox.addTextChangedListener(object: TextWatcher {
             override fun afterTextChanged(s: Editable?) {
             }
 
@@ -102,17 +83,11 @@ class SnippetSession(
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (s == null) return
-                val term = s.toString().toLowerCase()
-                appAdapter.filter {
-                    it.packageName.toLowerCase().contains(term) or it.label.toLowerCase().contains(term)
-                }
+//                val term = s.toString().toLowerCase()
+//                currentTab.filter {
+//                    it.packageName.toLowerCase().contains(term) or it.label.toLowerCase().contains(term)
+//                }
             }
-        })
-    }
-
-    private fun onDataLoaded(apps: List<App>) {
-        context.runOnUiThread(Runnable {
-            appAdapter.setDataset(apps)
         })
     }
 }

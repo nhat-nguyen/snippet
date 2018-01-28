@@ -1,4 +1,4 @@
-package com.penryn.snippet.adapters
+package com.penryn.snippet.adapters.recyclerview
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
@@ -17,8 +17,7 @@ import com.penryn.snippet.models.App
 
 class AppAdapter(
     context: Context,
-    dataset: List<App>,
-    private val listener: (app: App) -> Unit
+    dataset: List<App>
 ) : FilterableAdapter<App, AppAdapter.AppViewHolder>(context, dataset) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppViewHolder {
@@ -32,7 +31,7 @@ class AppAdapter(
         holder.appLabel.setText(app.label)
         holder.appPackageName.setText(app.packageName)
         holder.rootView.setOnClickListener {
-            listener.invoke(filteredDataset[holder.adapterPosition])
+            listener?.invoke(filteredDataset[holder.adapterPosition])
         }
     }
 

@@ -5,20 +5,24 @@ import android.content.Context
 import android.os.Bundle
 import android.service.voice.VoiceInteractionSession
 import android.service.voice.VoiceInteractionSessionService
+import android.util.Log
 import android.view.inputmethod.InputMethodManager
 import com.penryn.snippet.database.SnippetAppDatabase
-import io.realm.internal.SyncObjectServerFacade
 
 /**
  * Created by hoangnhat on 2017-09-03.
  */
 
 class SnippetSessionService : VoiceInteractionSessionService() {
+    private val TAG: String = SnippetSessionService::class.java.simpleName
+
     override fun onNewSession(bundle: Bundle): VoiceInteractionSession {
+        Log.d(TAG, "onNewSession called!")
+
         return SnippetSession(
             this,
             Room.databaseBuilder(
-                SyncObjectServerFacade.getApplicationContext(),
+                applicationContext,
                 SnippetAppDatabase::class.java,
                 "apps"
             ).build(),
