@@ -7,16 +7,19 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
+import android.service.voice.VoiceInteractionService
 import android.widget.Toast
 import com.penryn.snippet.database.SnippetAppDatabase
 import com.penryn.snippet.extensions.getLaunchableApplications
 import kotlinx.android.synthetic.main.activity_main.*
 
-
 class MainActivity : Activity() {
     private lateinit var database: SnippetAppDatabase
 
-    private val classes = arrayOf(SnippetService::class.java, SnippetSessionService::class.java)
+    private val ASSIST_SERVICE_PROBE = Intent(VoiceInteractionService.SERVICE_INTERFACE)
+    private val ASSIST_ACTIVITY_PROBE = Intent(Intent.ACTION_ASSIST)
+
+    private val classes = arrayOf(SnippetInteractionService::class.java, SnippetSessionService::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,18 +29,27 @@ class MainActivity : Activity() {
             startActivity(Intent(Settings.ACTION_VOICE_INPUT_SETTINGS))
         }
 
+        trigger_service.setOnClickListener {
+            val intent = Intent(this, SnippetInteractionService::class.java)
+            intent.setAction(Intent.ACTION_ASSIST)
+            applicationContext.startService(intent)
+            showAssist(Bundle())
+//            packageManager.queryIntentServices(ASSIST_SERVICE_PROBE, PackageManager.GET_META_DATA)
+//            packageManager.queryIntentActivities(ASSIST_ACTIVITY_PROBE, PackageManager.MATCH_DEFAULT_ONLY)
+        }
+
         start_all_services.setOnClickListener {
             classes.map { Intent(this, it) }.forEach { startService(it) }
             Toast.makeText(this, "Started!", Toast.LENGTH_SHORT).show()
         }
 
         stop_all_services.setOnClickListener {
-            classes.map { Intent(this, it) }.forEach { startService(it) }
+            classes.map { Intent(this, it) }.forEach { stopService(it) }
             Toast.makeText(this, "Stopped!", Toast.LENGTH_SHORT).show()
         }
 
         start_snippet_service.setOnClickListener {
-            val serviceIntent = Intent(this, SnippetService::class.java)
+            val serviceIntent = Intent(this, SnippetInteractionService::class.java)
             startService(serviceIntent)
             Toast.makeText(this, "Started!", Toast.LENGTH_SHORT).show()
         }
@@ -49,7 +61,7 @@ class MainActivity : Activity() {
         }
 
         snippet_service_running.setOnClickListener {
-            if (isServiceRunning(SnippetService::class.java)) {
+            if (isServiceRunning(SnippetInteractionService::class.java)) {
                 Toast.makeText(this, "Yes!", Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(this, "No!", Toast.LENGTH_SHORT).show()
@@ -57,7 +69,7 @@ class MainActivity : Activity() {
         }
 
         snippet_session_service_running.setOnClickListener {
-            if (isServiceRunning(SnippetService::class.java)) {
+            if (isServiceRunning(SnippetInteractionService::class.java)) {
                 Toast.makeText(this, "Yes!", Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(this, "No!", Toast.LENGTH_SHORT).show()

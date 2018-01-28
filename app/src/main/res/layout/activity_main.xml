@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center_vertical"
     tools:context="com.penryn.snippet.MainActivity">
 
     <Button
@@ -14,6 +15,15 @@
         android:layout_gravity="center_horizontal"
         android:textSize="12sp"
         android:text="Set as default device assistant"/>
+
+    <Button
+        android:id="@+id/trigger_service"
+        android:layout_width="270dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textSize="12sp"
+        android:text="Try trigger"/>
+
 
     <Button
         android:id="@+id/start_all_services"
