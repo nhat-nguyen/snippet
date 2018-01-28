@@ -1,21 +1,67 @@
 package com.penryn.snippet
 
 import android.app.Activity
+import android.app.ActivityManager
 import android.arch.persistence.room.Room
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.Toast
 import com.penryn.snippet.database.SnippetAppDatabase
 import com.penryn.snippet.extensions.getLaunchableApplications
 import kotlinx.android.synthetic.main.activity_main.*
 
+
 class MainActivity : Activity() {
     private lateinit var database: SnippetAppDatabase
+
+    private val classes = arrayOf(SnippetService::class.java, SnippetSessionService::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        set_default_assistant.setOnClickListener {
 
+        set_default_assistant.setOnClickListener {
+            startActivity(Intent(Settings.ACTION_VOICE_INPUT_SETTINGS))
+        }
+
+        start_all_services.setOnClickListener {
+            classes.map { Intent(this, it) }.forEach { startService(it) }
+            Toast.makeText(this, "Started!", Toast.LENGTH_SHORT).show()
+        }
+
+        stop_all_services.setOnClickListener {
+            classes.map { Intent(this, it) }.forEach { startService(it) }
+            Toast.makeText(this, "Stopped!", Toast.LENGTH_SHORT).show()
+        }
+
+        start_snippet_service.setOnClickListener {
+            val serviceIntent = Intent(this, SnippetService::class.java)
+            startService(serviceIntent)
+            Toast.makeText(this, "Started!", Toast.LENGTH_SHORT).show()
+        }
+
+        start_snippet_session_service.setOnClickListener {
+            val serviceIntent = Intent(this, SnippetSessionService::class.java)
+            startService(serviceIntent)
+            Toast.makeText(this, "Started!", Toast.LENGTH_SHORT).show()
+        }
+
+        snippet_service_running.setOnClickListener {
+            if (isServiceRunning(SnippetService::class.java)) {
+                Toast.makeText(this, "Yes!", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "No!", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        snippet_session_service_running.setOnClickListener {
+            if (isServiceRunning(SnippetService::class.java)) {
+                Toast.makeText(this, "Yes!", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "No!", Toast.LENGTH_SHORT).show()
+            }
         }
 
         database = Room.databaseBuilder(
@@ -24,6 +70,7 @@ class MainActivity : Activity() {
             "apps"
         ).build()
 
+        // TODO: Needs to be synchronized
         rebuild_index.setOnClickListener {
             Thread(Runnable {
                 database.appDao().dropTable()
@@ -33,5 +80,10 @@ class MainActivity : Activity() {
                 }
             }).start()
         }
+    }
+
+    private fun isServiceRunning(serviceClass: Class<*>): Boolean {
+        val manager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        return manager.getRunningServices(Integer.MAX_VALUE).any { serviceClass.name == it.service.className }
     }
 }
