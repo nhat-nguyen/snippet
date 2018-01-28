@@ -9,8 +9,8 @@ import android.util.Log
  * Created by hoangnhat on 2017-09-03.
  */
 
-class SnippetService : VoiceInteractionService() {
-    private val TAG: String = SnippetService::class.java.simpleName
+class SnippetInteractionService : VoiceInteractionService() {
+    private val TAG: String = SnippetInteractionService::class.java.simpleName
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(TAG, "onStartCommand called!")
